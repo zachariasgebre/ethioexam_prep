@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { submitExamAttempt } from "@/lib/actions/exams";
+import { dashboardProgressQueryKey } from "@/lib/query-keys";
 
 type QuizQuestion = {
   id: string;
@@ -10,6 +12,7 @@ type QuizQuestion = {
 };
 
 export function ExamQuizRunner({ examId, questions }: { examId: string; questions: QuizQuestion[] }) {
+  const queryClient = useQueryClient();
   const [activeQuestion, setActiveQuestion] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, number>>({});
   const [score, setScore] = useState<number | null>(null);
@@ -30,6 +33,7 @@ export function ExamQuizRunner({ examId, questions }: { examId: string; question
         setError(result.error ?? "Unable to submit this quiz.");
         return;
       }
+      await queryClient.invalidateQueries({ queryKey: dashboardProgressQueryKey });
       setScore(result.score);
     } catch {
       setError("We could not save your result. Please try again.");

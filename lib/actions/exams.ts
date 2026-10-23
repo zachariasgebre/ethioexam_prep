@@ -1,10 +1,29 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { exams, questions, userProgress } from "@/db/schema";
 import { verifySession } from "@/lib/dal";
+
+export async function getUserProgress() {
+  const { user } = await verifySession();
+  return db.select({
+    id: userProgress.id,
+    score: userProgress.score,
+    totalQuestions: userProgress.totalQuestions,
+    completedAt: userProgress.completedAt,
+    subject: exams.subject,
+    year: exams.year,
+  }).from(userProgress)
+    .innerJoin(exams, eq(userProgress.examId, exams.id))
+    .where(eq(userProgress.userId, user.id))
+    .orderBy(desc(userProgress.completedAt))
+    .then((attempts) => attempts.map((attempt) => ({
+      ...attempt,
+      completedAt: attempt.completedAt.toISOString(),
+    })));
+}
 
 export async function submitExamAttempt(
   examId: string,
