@@ -6,7 +6,8 @@ import { ExamQuizRunner } from "@/components/exam-quiz-runner";
 
 export default async function ExamPage({ params }: { params: Promise<{ subject: string; year: string }> }) {
   const { subject, year } = await params;
-  const [exam] = await db.select().from(exams).where(and(eq(exams.subject, decodeURIComponent(subject)), eq(exams.year, decodeURIComponent(year)))).limit(1);
+  // App Router params are already decoded. Decoding again can throw on literal percent signs.
+  const [exam] = await db.select().from(exams).where(and(eq(exams.subject, subject), eq(exams.year, year))).limit(1);
   if (!exam) notFound();
   const examQuestions = await db.select({
     id: questions.id,

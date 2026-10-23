@@ -89,6 +89,9 @@ export async function submitExamAttempt(
 
 export async function deleteUserProgress(progressId: string) {
   const { user } = await verifySession();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(progressId)) {
+    return { error: "Record not found or unauthorized" };
+  }
   const deleted = await db.delete(userProgress)
     .where(and(eq(userProgress.id, progressId), eq(userProgress.userId, user.id)))
     .returning({ id: userProgress.id });
