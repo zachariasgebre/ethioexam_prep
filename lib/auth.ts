@@ -10,12 +10,7 @@ export const auth = betterAuth({
   emailAndPassword: { enabled: true },
   user: {
     additionalFields: {
-      hasPaid: {
-        type: "boolean",
-        required: false,
-        defaultValue: false,
-        input: false,
-      },
+      hasPaid: { type: "boolean", required: false, defaultValue: false, input: false },
     },
   },
   plugins: [admin()],
