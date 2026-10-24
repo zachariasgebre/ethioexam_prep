@@ -30,8 +30,9 @@ EthioExam Prep enforces a 3-layer defense-in-depth model:
 
 | Action File | Function | Line Number(s) | Defense Logic |
 | :--- | :--- | :--- | :--- |
-| `lib/actions/exams.ts` | `submitExamAttempt` | Lines 10 | `const { user } = await verifySession();` verifies active session before writing progress. |
-| `lib/actions/exams.ts` | `deleteUserProgress` | Lines 26 | `const { user } = await verifySession();` verifies active session before allowing deletions. |
+| `lib/actions/exams.ts` | `getUserProgress` | Line 10 | `const { user } = await verifySession();` verifies active session before returning student progress. |
+| `lib/actions/exams.ts` | `submitExamAttempt` | Line 32 | `const { user } = await verifySession();` verifies active session before computing score and logging attempt. |
+| `lib/actions/exams.ts` | `deleteUserProgress` | Line 91 | `const { user } = await verifySession();` verifies active session before allowing deletions. |
 | `lib/actions/admin.ts` | `toggleUserPaidStatus` | Lines 15 & 18–20 | `const { user: currentUser } = await verifySession();` followed by `currentUser.role !== "admin"` check. |
 | `lib/actions/admin.ts` | `setUserRole` | Lines 47 & 50–52 | `const { user: currentUser } = await verifySession();` followed by `currentUser.role !== "admin"` check. |
 
@@ -49,8 +50,8 @@ EthioExam Prep enforces a 3-layer defense-in-depth model:
 
 | Action File | Function | Line Number(s) | Defense Logic |
 | :--- | :--- | :--- | :--- |
-| `lib/actions/exams.ts` | `deleteUserProgress` | Lines 27–30 | `.where(and(eq(userProgress.id, progressId), eq(userProgress.userId, user.id)))` prevents modifying another student's record. |
-| `lib/actions/exams.ts` | `submitExamAttempt` | Line 20 | `userId: user.id` strictly forces the record to attach exclusively to the session owner's ID, ignoring any spoofed client identity. |
+| `lib/actions/exams.ts` | `deleteUserProgress` | Lines 95–97 | `.where(and(eq(userProgress.id, progressId), eq(userProgress.userId, user.id)))` prevents modifying another student's record. |
+| `lib/actions/exams.ts` | `submitExamAttempt` | Line 81 | `userId: user.id` strictly forces the record to attach exclusively to the session owner's ID, ignoring any spoofed client identity. |
 | `lib/actions/admin.ts` | `setUserRole` | Lines 58–60 | Prevents self-demotion lockout: `targetUserId === currentUser.id && role !== "admin"`. |
 
 ---
@@ -61,16 +62,17 @@ EthioExam Prep enforces a 3-layer defense-in-depth model:
 * **Vulnerability if Unchecked**: Open redirects destroy user trust and facilitate credential theft via subsequent spoofed login screens.
 * **Mitigation Implementation**:
   All redirect destinations are sanitized through `safeNext()` in `lib/safe-next.ts`. The validator enforces:
-  1. The parameter must be a string.
-  2. It must begin with a single slash `/`.
-  3. It must NOT begin with protocol-relative `//` or backslash-escaped `/\`.
+  1. The parameter must be a string and start with `/`.
+  2. Rejection of protocol-relative `//` and backslash-escaped `\` characters.
+  3. Rejection of ASCII control characters (`[\u0000-\u001f\u007f]`).
+  4. URL decoding verification ensuring that decoded paths cannot spoof external origins or protocols.
   If any validation condition fails, it safely falls back to internal `/dashboard`.
 
 #### Concrete Code References for Attack 3:
 
 | Component / Utility File | Function / Location | Line Number(s) | Defense Logic |
 | :--- | :--- | :--- | :--- |
-| `lib/safe-next.ts` | `safeNext` | Lines 1–6 | Sanitizes the redirect target, rejecting off-site and protocol-relative schemes. |
+| `lib/safe-next.ts` | `safeNext` | Lines 1–26 | Multi-check sanitization enforcing relative URL path with origin and decoding validation. |
 | `components/sign-in-form.tsx` | `handleSubmit` | Line 16 | `router.push(safeNext(nextTo));` wraps navigation in sanitization. |
 | `components/sign-up-form.tsx` | `handleSubmit` | Line 16 | `router.push(safeNext(nextTo));` wraps navigation in sanitization. |
 | `middleware.ts` | `middleware` | Line 7 | Sets `next` strictly to `request.nextUrl.pathname` (always internal relative path). |
@@ -81,7 +83,6 @@ EthioExam Prep enforces a 3-layer defense-in-depth model:
 
 | Attack Vector | Threat Level | Defense Technique | Verified File Locations |
 | :--- | :--- | :--- | :--- |
-| **Attack 1 (Unauthenticated RPC)** | Critical | DAL Server Session Verification (`verifySession()`) | `lib/actions/exams.ts:10,26`<br>`lib/actions/admin.ts:15,47` |
-| **Attack 2 (IDOR / Cross-User Deletion)** | High | Composite Key Scoping (`eq(userId, user.id)`) | `lib/actions/exams.ts:27-30` |
-| **Attack 3 (Open Redirect)** | Medium | Path Whitelisting & Prefix Enforcement (`safeNext()`) | `lib/safe-next.ts:1-6`<br>`components/sign-in-form.tsx:16`<br>`components/sign-up-form.tsx:16` |
-
+| **Attack 1 (Unauthenticated RPC)** | Critical | DAL Server Session Verification (`verifySession()`) | `lib/actions/exams.ts:10,32,91`<br>`lib/actions/admin.ts:15,47` |
+| **Attack 2 (IDOR / Cross-User Deletion)** | High | Composite Key Scoping (`eq(userId, user.id)`) | `lib/actions/exams.ts:81,95-97` |
+| **Attack 3 (Open Redirect)** | Medium | Path Whitelisting & Origin Decoding (`safeNext()`) | `lib/safe-next.ts:1-26`<br>`components/sign-in-form.tsx:16`<br>`components/sign-up-form.tsx:16` |
