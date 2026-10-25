@@ -3,3 +3,5 @@
 :root { color-scheme: light; }
 body { margin: 0; background: #f8fafc; color: #172033; font-family: Arial, Helvetica, sans-serif; }
 a { color: inherit; }
+:focus-visible { outline: 3px solid #047857; outline-offset: 3px; }
+button:disabled { cursor: not-allowed; }

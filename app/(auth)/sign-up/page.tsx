@@ -1,5 +1,8 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { SignUpForm } from "@/components/sign-up-form";
+
+export const metadata: Metadata = { title: "Create account | EthioExam Prep", description: "Create an account to track your Ethiopian national exam practice." };
 
 export default async function SignUpPage({ searchParams }: { searchParams: Promise<{ next?: string | string[] }> }) {
   const { next } = await searchParams;

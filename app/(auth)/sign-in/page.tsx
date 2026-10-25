@@ -1,5 +1,8 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { SignInForm } from "@/components/sign-in-form";
+
+export const metadata: Metadata = { title: "Sign in | EthioExam Prep", description: "Sign in to continue your exam preparation." };
 
 export default async function SignInPage({ searchParams }: { searchParams: Promise<{ next?: string | string[] }> }) {
   const { next } = await searchParams;

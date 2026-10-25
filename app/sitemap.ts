@@ -1,6 +1,19 @@
 import type { MetadataRoute } from "next";
+import { db } from "@/db";
+import { exams } from "@/db/schema";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const dynamic = "force-dynamic";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
-  return ["", "/exams", "/sign-in", "/sign-up"].map((path) => ({ url: `${base}${path}`, lastModified: new Date() }));
+  const routes: MetadataRoute.Sitemap = ["", "/exams", "/sign-in", "/sign-up"].map((path) => ({ url: `${base}${path}` }));
+  try {
+    const availableExams = await db.select({ subject: exams.subject, year: exams.year }).from(exams);
+    routes.push(...availableExams.map(({ subject, year }) => ({
+      url: `${base}/exams/${encodeURIComponent(subject)}/${encodeURIComponent(year)}`,
+    })));
+  } catch (error) {
+    console.warn("Could not load exam routes for sitemap:", error);
+  }
+  return routes;
 }

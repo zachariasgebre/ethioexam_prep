@@ -3,6 +3,15 @@ import { notFound } from "next/navigation";
 import { db } from "@/db";
 import { exams, questions } from "@/db/schema";
 import { ExamQuizRunner } from "@/components/exam-quiz-runner";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ subject: string; year: string }> }): Promise<Metadata> {
+  const { subject, year } = await params;
+  return {
+    title: `${subject} ${year} Practice Exam | EthioExam Prep`,
+    description: `Practice the ${subject} ${year} Ethiopian national exam with interactive questions and instant scoring.`,
+  };
+}
 
 export default async function ExamPage({ params }: { params: Promise<{ subject: string; year: string }> }) {
   const { subject, year } = await params;
