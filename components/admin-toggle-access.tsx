@@ -53,19 +53,21 @@ export function AdminToggleAccess({ targetUser, isCurrentUser }: AdminToggleAcce
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-3">
         {/* Paid Status Toggle */}
-        <button
-          type="button"
-          onClick={handleTogglePaid}
-          disabled={isPending}
-          className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
-            targetUser.hasPaid
-              ? "bg-amber-100 text-amber-900 hover:bg-amber-200"
-              : "bg-emerald-700 text-white hover:bg-emerald-800"
-          }`}
-          aria-label={`${targetUser.hasPaid ? "Revoke" : "Grant"} paid access for ${targetUser.name}`}
-        >
-          {targetUser.hasPaid ? "Revoke Paid Access" : "Grant Paid Access"}
-        </button>
+        {targetUser.role !== "admin" && (
+          <button
+            type="button"
+            onClick={handleTogglePaid}
+            disabled={isPending}
+            className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
+              targetUser.hasPaid
+                ? "bg-amber-100 text-amber-900 hover:bg-amber-200"
+                : "bg-emerald-700 text-white hover:bg-emerald-800"
+            }`}
+            aria-label={`${targetUser.hasPaid ? "Revoke" : "Grant"} paid access for ${targetUser.name}`}
+          >
+            {targetUser.hasPaid ? "Revoke Paid Access" : "Grant Paid Access"}
+          </button>
+        )}
 
         {/* Role Switcher */}
         <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 p-0.5">

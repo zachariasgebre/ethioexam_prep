@@ -36,7 +36,8 @@ export default async function AdminPage() {
 
   const totalUsers = allUsers.length;
   const adminCount = allUsers.filter((u) => u.role === "admin").length;
-  const paidCount = allUsers.filter((u) => u.hasPaid).length;
+  const studentCount = allUsers.filter((u) => u.role !== "admin").length;
+  const paidCount = allUsers.filter((u) => u.role !== "admin" && u.hasPaid).length;
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-12">
@@ -84,7 +85,7 @@ export default async function AdminPage() {
             <p className="mt-2 text-3xl font-bold text-emerald-700">{paidCount}</p>
           </div>
           <p className="mt-3 text-xs text-slate-500">
-            {totalUsers > 0 ? Math.round((paidCount / totalUsers) * 100) : 0}% of student accounts
+            {studentCount > 0 ? Math.round((paidCount / studentCount) * 100) : 0}% of student accounts
           </p>
         </Card>
 
@@ -142,7 +143,12 @@ export default async function AdminPage() {
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {u.hasPaid ? (
+                          {u.role === "admin" ? (
+                            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-purple-700">
+                              <span className="h-2 w-2 rounded-full bg-purple-500" />
+                              Admin Access
+                            </span>
+                          ) : u.hasPaid ? (
                             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700">
                               <span className="h-2 w-2 rounded-full bg-emerald-500" />
                               Paid Access
