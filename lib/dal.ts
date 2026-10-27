@@ -9,3 +9,11 @@ export const verifySession = cache(async () => {
   if (!session) redirect("/sign-in");
   return session;
 });
+
+export const verifyPaidSession = cache(async () => {
+  const session = await verifySession();
+  if (session.user.role !== "admin" && session.user.hasPaid !== true) {
+    redirect("/pricing");
+  }
+  return session;
+});

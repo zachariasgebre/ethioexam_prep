@@ -9,6 +9,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes: MetadataRoute.Sitemap = ["", "/exams", "/sign-in", "/sign-up"].map((path) => ({ url: `${base}${path}` }));
   try {
     const availableExams = await db.select({ subject: exams.subject, year: exams.year }).from(exams);
+    const subjects = Array.from(new Set(availableExams.map(({ subject }) => subject)));
+    routes.push(...subjects.map((subject) => ({
+      url: `${base}/exams/${encodeURIComponent(subject)}`,
+    })));
     routes.push(...availableExams.map(({ subject, year }) => ({
       url: `${base}/exams/${encodeURIComponent(subject)}/${encodeURIComponent(year)}`,
     })));

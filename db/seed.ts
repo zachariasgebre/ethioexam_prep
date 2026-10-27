@@ -1,82 +1,109 @@
-import { db } from "./index";
-import { exams, questions } from "./schema";
+import { randomUUID } from "node:crypto";
+import { and, eq } from "drizzle-orm";
+import { hashPassword } from "better-auth/crypto";
+import { db, pool } from "./connection";
+import { account as authAccount, exams, questions, user as authUser } from "./schema";
+import { examSeedData } from "./seed-data";
 
-async function seed() {
-  console.log("🌱 Seeding database with sample exams and questions...");
+const demoAccounts = [
+  { name: "EthioExam Admin", email: "admin@ethioexam.com", role: "admin", hasPaid: true },
+  { name: "Paid Student", email: "student.paid@ethioexam.com", role: "user", hasPaid: true },
+  { name: "Unpaid Student", email: "student.unpaid@ethioexam.com", role: "user", hasPaid: false },
+] as const;
+const demoPassword = "password123";
 
-  // Insert sample exams
-  const [exam1] = await db.insert(exams).values({
-    subject: "Physics",
-    year: "2015 E.C.",
-    totalQuestions: 3,
-    isPremium: false,
-  }).returning();
+async function seedDemoAccounts() {
+  for (const demoAccount of demoAccounts) {
+    const passwordHash = await hashPassword(demoPassword);
+    await db.transaction(async (tx) => {
+      const [existingUser] = await tx.select({ id: authUser.id }).from(authUser)
+        .where(eq(authUser.email, demoAccount.email)).limit(1);
+      const userId = existingUser?.id ?? randomUUID();
+      const now = new Date();
 
-  const [exam2] = await db.insert(exams).values({
-    subject: "Mathematics",
-    year: "2016 E.C.",
-    totalQuestions: 3,
-    isPremium: false,
-  }).returning();
+      if (existingUser) {
+        await tx.update(authUser).set({
+          name: demoAccount.name,
+          role: demoAccount.role,
+          hasPaid: demoAccount.hasPaid,
+          updatedAt: now,
+        }).where(eq(authUser.id, userId));
+      } else {
+        await tx.insert(authUser).values({
+          id: userId,
+          name: demoAccount.name,
+          email: demoAccount.email,
+          emailVerified: false,
+          role: demoAccount.role,
+          hasPaid: demoAccount.hasPaid,
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
 
-  // Insert questions for Physics
-  if (exam1) {
-    await db.insert(questions).values([
-      {
-        examId: exam1.id,
-        prompt: "What is the SI unit of electric current?",
-        options: ["Volt", "Ampere", "Ohm", "Watt"],
-        correctOptionIndex: 1,
-        explanation: "Ampere is the standard international unit for electric current.",
-      },
-      {
-        examId: exam1.id,
-        prompt: "Which of the following is a vector quantity?",
-        options: ["Speed", "Distance", "Velocity", "Mass"],
-        correctOptionIndex: 2,
-        explanation: "Velocity has both magnitude and direction, making it a vector quantity.",
-      },
-      {
-        examId: exam1.id,
-        prompt: "What is the acceleration due to gravity on Earth approximately?",
-        options: ["9.8 m/s²", "3.0 × 10⁸ m/s", "6.67 × 10⁻¹¹", "1.6 m/s²"],
-        correctOptionIndex: 0,
-        explanation: "Standard acceleration due to gravity is approximately 9.8 m/s².",
-      },
-    ]);
+      const [credentialAccount] = await tx.select({ id: authAccount.id }).from(authAccount)
+        .where(and(eq(authAccount.userId, userId), eq(authAccount.providerId, "credential"))).limit(1);
+      if (credentialAccount) {
+        await tx.update(authAccount).set({
+          accountId: userId,
+          password: passwordHash,
+          updatedAt: now,
+        }).where(eq(authAccount.id, credentialAccount.id));
+      } else {
+        await tx.insert(authAccount).values({
+          id: randomUUID(),
+          accountId: userId,
+          providerId: "credential",
+          userId,
+          password: passwordHash,
+          createdAt: now,
+          updatedAt: now,
+        });
+      }
+    });
   }
-
-  // Insert questions for Mathematics
-  if (exam2) {
-    await db.insert(questions).values([
-      {
-        examId: exam2.id,
-        prompt: "What is the derivative of x² with respect to x?",
-        options: ["x", "2x", "x²", "2"],
-        correctOptionIndex: 1,
-        explanation: "Using the power rule, d/dx(x²) = 2x.",
-      },
-      {
-        examId: exam2.id,
-        prompt: "What is the value of sin(90°)?",
-        options: ["0", "0.5", "1", "-1"],
-        correctOptionIndex: 2,
-        explanation: "Sine of 90 degrees is 1.",
-      },
-      {
-        examId: exam2.id,
-        prompt: "Solve for x: 2x + 4 = 10",
-        options: ["2", "3", "4", "5"],
-        correctOptionIndex: 1,
-        explanation: "2x = 6, so x = 3.",
-      },
-    ]);
-  }
-
-  console.log("✅ Database seeding completed successfully!");
 }
 
-seed().catch((err) => {
-  console.error("❌ Seeding failed:", err);
-  process.exit(1);
+async function seed() {
+  let inserted = 0;
+  let skipped = 0;
+
+  for (const fixture of examSeedData) {
+    const created = await db.transaction(async (tx) => {
+      const [exam] = await tx.insert(exams).values({
+        subject: fixture.subject,
+        year: fixture.year,
+        totalQuestions: fixture.questions.length,
+        isPremium: false,
+      }).onConflictDoNothing({ target: [exams.subject, exams.year] }).returning({ id: exams.id });
+
+      if (!exam) return false;
+
+      await tx.insert(questions).values(fixture.questions.map((question) => ({
+        examId: exam.id,
+        prompt: question.prompt,
+        options: question.options,
+        correctOptionIndex: question.correctOptionIndex,
+        explanation: question.explanation,
+      })));
+      return true;
+    });
+
+    if (created) inserted += 1;
+    else skipped += 1;
+  }
+
+  console.log(`Seed complete: added ${inserted} exams; skipped ${skipped} existing exams.`);
+  if (process.env.NODE_ENV === "production") {
+    console.log("Skipping fixed-password test accounts in production.");
+  } else {
+    await seedDemoAccounts();
+    console.log(`Ensured ${demoAccounts.length} local Better Auth test accounts.`);
+  }
+}
+
+seed().then(() => pool.end()).catch(async (error: unknown) => {
+  console.error("Exam seed failed:", error);
+  await pool.end();
+  process.exitCode = 1;
 });

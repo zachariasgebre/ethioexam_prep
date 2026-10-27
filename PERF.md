@@ -22,6 +22,6 @@ To capture comparable measurements, run the same production build and Lighthouse
 
 ## Verification limits
 
-`npm run lint` completes with zero errors and one pre-existing style warning in `postcss.config.mjs`. `npm run build` completes with temporary build-only environment values and no local PostgreSQL server; the exam index uses its sample fixture fallback. The generated route table reports `/sitemap.xml` as dynamic.
+`npm run lint` completes with zero errors and one existing style warning in `postcss.config.mjs`. The production build completes with the local `.env.local` configuration and PostgreSQL available. The generated route table reports `/sitemap.xml` as dynamic.
 
 The Day 4 security battery was reviewed against the server action implementations and documented in `DATA.md`/`AUTH.md`. Live console/RPC attempts and a two-account cross-user deletion attempt require a running PostgreSQL-backed app and authenticated browser sessions; those runtime checks have not been performed in this workspace. An isolated `safeNext()` check could not start because Node reported `uv_os_get_passwd returned ENOMEM`, so Attack 3 has source review but no runtime result.

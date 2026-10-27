@@ -5,3 +5,11 @@ body { margin: 0; background: #f8fafc; color: #172033; font-family: Arial, Helve
 a { color: inherit; }
 :focus-visible { outline: 3px solid #047857; outline-offset: 3px; }
 button:disabled { cursor: not-allowed; }
+.answer-reveal:not([hidden]) { animation: answer-reveal-in 220ms ease-out; }
+@keyframes answer-reveal-in {
+  from { opacity: 0; transform: translateY(-0.35rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .answer-reveal:not([hidden]) { animation: none; }
+}

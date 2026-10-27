@@ -16,23 +16,26 @@ function ScoreChart({ attempts }: { attempts: Attempt[] }) {
   }
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 overflow-x-auto">
       <div
-        className="flex h-52 items-end gap-3 border-b border-l border-slate-300 px-2"
+        className="flex h-60 min-w-[36rem] items-end gap-3 border-b border-l border-slate-300 px-2 sm:min-w-0"
         role="img"
-        aria-label={`Quiz score chart for ${recentAttempts.length} recent attempts. ${recentAttempts.map((attempt) => `${attempt.subject} ${attempt.year}: ${Math.round((attempt.score / attempt.totalQuestions) * 100)} percent`).join("; ")}.`}
+        aria-label={`Quiz score chart for ${recentAttempts.length} recent attempts. ${recentAttempts.map((attempt) => `${new Date(attempt.completedAt).toLocaleDateString("en-US")}, ${attempt.subject} ${attempt.year}: ${Math.round((attempt.score / attempt.totalQuestions) * 100)} percent`).join("; ")}.`}
       >
         {recentAttempts.map((attempt) => {
           const percentage = Math.round((attempt.score / attempt.totalQuestions) * 100);
+          const dateLabel = new Date(attempt.completedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
           return (
-            <div key={attempt.id} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2" title={`${attempt.subject} ${attempt.year}: ${percentage}%`}>
+            <div key={attempt.id} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2" title={`${dateLabel}: ${attempt.subject} ${attempt.year}, ${percentage}%`}>
               <span aria-hidden="true" className="text-xs font-medium text-slate-600">{percentage}%</span>
               <div
                 aria-hidden="true"
                 className="w-full max-w-14 rounded-t-md bg-emerald-700"
                 style={{ height: `${Math.max(percentage, 2)}%` }}
               />
-              <span aria-hidden="true" className="w-full truncate text-center text-[10px] text-slate-500">{attempt.subject}</span>
+              <span aria-hidden="true" className="w-full break-words text-center text-[10px] leading-tight text-slate-600">{attempt.subject}</span>
+              <span aria-hidden="true" className="whitespace-nowrap text-[9px] leading-tight text-slate-500">{attempt.year}</span>
+              <span aria-hidden="true" className="whitespace-nowrap text-[9px] leading-tight text-slate-400">{dateLabel}</span>
             </div>
           );
         })}

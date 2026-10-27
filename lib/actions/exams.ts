@@ -25,6 +25,44 @@ export async function getUserProgress() {
     })));
 }
 
+export async function revealExamAnswer(
+  examId: string,
+  questionId: string,
+  selectedOptionIndex?: number,
+) {
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidPattern.test(examId) || !uuidPattern.test(questionId)) {
+    return { error: "This question is unavailable." };
+  }
+  if (selectedOptionIndex !== undefined && (!Number.isInteger(selectedOptionIndex) || selectedOptionIndex < 0)) {
+    return { error: "Choose a valid answer option." };
+  }
+
+  const [question] = await db.select({
+    correctOptionIndex: questions.correctOptionIndex,
+    options: questions.options,
+    explanation: questions.explanation,
+  }).from(questions)
+    .where(and(eq(questions.id, questionId), eq(questions.examId, examId)))
+    .limit(1);
+
+  if (
+    !question ||
+    !Array.isArray(question.options) ||
+    !Number.isInteger(question.correctOptionIndex) ||
+    question.correctOptionIndex < 0 ||
+    question.correctOptionIndex >= question.options.length ||
+    (selectedOptionIndex !== undefined && selectedOptionIndex >= question.options.length)
+  ) {
+    return { error: "This question or answer option is unavailable." };
+  }
+
+  return {
+    correctOptionIndex: question.correctOptionIndex,
+    explanation: question.explanation,
+  };
+}
+
 export async function submitExamAttempt(
   examId: string,
   answers: Array<{ questionId: string; selectedOptionIndex: number }>,

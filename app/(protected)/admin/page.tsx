@@ -54,6 +54,12 @@ export default async function AdminPage() {
         </div>
         <div className="flex items-center gap-3">
           <Link
+            href="/admin/exams/new"
+            className="rounded-lg bg-purple-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-800"
+          >
+            Create Exam
+          </Link>
+          <Link
             href="/dashboard"
             className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
           >

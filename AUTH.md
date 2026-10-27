@@ -86,3 +86,9 @@ EthioExam Prep enforces a 3-layer defense-in-depth model:
 | **Attack 1 (Unauthenticated RPC)** | Critical | DAL Server Session Verification (`verifySession()`) | `lib/actions/exams.ts:10,32,91`<br>`lib/actions/admin.ts:15,47` |
 | **Attack 2 (IDOR / Cross-User Deletion)** | High | Composite Key Scoping (`eq(userId, user.id)`) | `lib/actions/exams.ts:81,95-97` |
 | **Attack 3 (Open Redirect)** | Medium | Path Whitelisting & Origin Decoding (`safeNext()`) | `lib/safe-next.ts:1-26`<br>`components/sign-in-form.tsx:16`<br>`components/sign-up-form.tsx:16` |
+
+## Exam access by payment status
+
+The `/exams/[subject]/[year]` Server Component calls `verifyPaidSession()` from `lib/dal.ts` before loading question data. The DAL first verifies the Better Auth session, then permits admins or users with `hasPaid === true`; an unpaid signed-in user is redirected to `/pricing`. The exam index and subject/year selection pages remain available for browsing.
+
+The admin user table exposes a paid-access grant/revoke button. Its `toggleUserPaidStatus` Server Action verifies the session and admin role before updating `user.has_paid`. `db/seed.ts` creates the documented fixed-password test accounts only outside production; their credentials are for local testing only.

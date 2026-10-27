@@ -17,8 +17,8 @@ export function SignInForm({ nextTo }: { nextTo?: string }) {
     } catch { setError("Unable to sign in right now. Please try again."); }
     finally { setPending(false); }
   }
-  return <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-    <label className="block text-sm font-medium">Email<input className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2" type="email" name="email" autoComplete="email" required /></label>
+  return <form className="mt-8 space-y-5" onSubmit={handleSubmit} autoComplete="off">
+    <label className="block text-sm font-medium">Email<input className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2" type="email" name="email" autoComplete="off" autoCapitalize="none" spellCheck={false} required /></label>
     <label className="block text-sm font-medium">Password<input className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2" type="password" name="password" autoComplete="current-password" required /></label>
     {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
     <button className="w-full rounded-lg bg-emerald-700 px-4 py-3 font-semibold text-white disabled:opacity-60" type="submit" disabled={pending}>{pending ? "Signing in…" : "Sign in"}</button>
