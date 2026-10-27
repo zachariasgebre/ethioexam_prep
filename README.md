@@ -51,7 +51,7 @@ EthioExam Prep turns Ethiopian national exam papers into scrollable multiple-cho
    node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"
    ```
 
-   Copy the generated value into `BETTER_AUTH_SECRET`. For local development, keep `BETTER_AUTH_URL=http://localhost:3000`.
+   Copy the generated value into `BETTER_AUTH_SECRET`. For local development, set `NEXT_PUBLIC_APP_URL=http://localhost:3000`.
 
 5. Create the database tables from the Drizzle schema:
 
@@ -116,7 +116,18 @@ The sign-in form stays available when another account is already signed in, so y
 | `npm run db:migrate` | Apply generated Drizzle migrations |
 | `npm run db:seed` | Add sample exams and ensure local test accounts |
 
-For a production deployment, configure a managed PostgreSQL database and production secrets, and use a reviewed migration workflow. Do not use the local test credentials.
+## Deploy to Vercel with Neon or Supabase
+
+1. Create a PostgreSQL database in Neon or Supabase. Copy its connection string; use the provider's pooled connection URL for a serverless app, and ensure it includes SSL requirements. Keep the URL private.
+2. Push this repository to GitHub and import it into Vercel. Vercel detects Next.js automatically; the default build command is `npm run build`.
+3. In **Vercel → Project → Settings → Environment Variables**, add these for Production (and Preview if needed):
+   - `DATABASE_URL`: the Neon/Supabase PostgreSQL connection string.
+   - `BETTER_AUTH_SECRET`: a unique random secret (generate with `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"`). Do not reuse the example or commit it.
+   - `NEXT_PUBLIC_APP_URL`: the deployed site origin, such as `https://your-project.vercel.app` (no trailing slash). Set the matching production domain after adding it.
+4. Before deploying, apply the Drizzle schema to the hosted database from a trusted local terminal with the production `DATABASE_URL` set: `npm run db:push`. For ongoing production schema changes, generate and review migrations with `npm run db:generate`, then apply them with `npm run db:migrate`. Never run the seed command in production; it creates fixed-password demo accounts in development only.
+5. Redeploy after setting variables. Verify sign-up/sign-in, exam access, and dashboard against the deployed database. Add the Vercel deployment origin to any provider-side allowed origins if you configure origin restrictions.
+
+Do not commit `.env.local`, paste secrets into source code, or use the local test credentials in production. Vercel environment variables are read at build/runtime as appropriate; redeploy after changing them.
 
 ## Project documentation
 

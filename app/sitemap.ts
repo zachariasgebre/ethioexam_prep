@@ -5,7 +5,7 @@ import { exams } from "@/db/schema";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
+  const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const routes: MetadataRoute.Sitemap = ["", "/exams", "/sign-in", "/sign-up"].map((path) => ({ url: `${base}${path}` }));
   try {
     const availableExams = await db.select({ subject: exams.subject, year: exams.year }).from(exams);
