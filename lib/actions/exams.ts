@@ -4,7 +4,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { exams, questions, userProgress } from "@/db/schema";
-import { verifySession } from "@/lib/dal";
+import { verifyPaidSession, verifySession } from "@/lib/dal";
 
 export async function getUserProgress() {
   const { user } = await verifySession();
@@ -30,6 +30,7 @@ export async function revealExamAnswer(
   questionId: string,
   selectedOptionIndex?: number,
 ) {
+  await verifyPaidSession();
   const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   if (!uuidPattern.test(examId) || !uuidPattern.test(questionId)) {
     return { error: "This question is unavailable." };
@@ -67,7 +68,7 @@ export async function submitExamAttempt(
   examId: string,
   answers: Array<{ questionId: string; selectedOptionIndex: number }>,
 ) {
-  const { user } = await verifySession();
+  const { user } = await verifyPaidSession();
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(examId)) {
     return { error: "Invalid exam" };
   }
