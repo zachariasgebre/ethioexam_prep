@@ -58,9 +58,9 @@ export function AdminToggleAccess({ targetUser, isCurrentUser }: AdminToggleAcce
             type="button"
             onClick={handleTogglePaid}
             disabled={isPending}
-            className={`inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
+            className={`ui-button min-h-10 px-3 py-1.5 text-xs ${
               targetUser.hasPaid
-                ? "bg-amber-100 text-amber-900 hover:bg-amber-200"
+                ? "border border-amber-200 bg-amber-50 text-amber-900 hover:bg-amber-100"
                 : "bg-emerald-700 text-white hover:bg-emerald-800"
             }`}
             aria-label={`${targetUser.hasPaid ? "Revoke" : "Grant"} paid access for ${targetUser.name}`}
@@ -75,7 +75,7 @@ export function AdminToggleAccess({ targetUser, isCurrentUser }: AdminToggleAcce
             type="button"
             onClick={() => handleRoleChange("user")}
             disabled={isPending || targetUser.role === "user" || isCurrentUser}
-            className={`rounded-md px-2.5 py-1 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${
+            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
               targetUser.role === "user"
                 ? "bg-white text-slate-900 shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
@@ -88,7 +88,7 @@ export function AdminToggleAccess({ targetUser, isCurrentUser }: AdminToggleAcce
             type="button"
             onClick={() => handleRoleChange("admin")}
             disabled={isPending || targetUser.role === "admin"}
-            className={`rounded-md px-2.5 py-1 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${
+            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
               targetUser.role === "admin"
                 ? "bg-purple-700 text-white shadow-sm"
                 : "text-slate-600 hover:text-slate-900"

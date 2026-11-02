@@ -19,7 +19,7 @@ export default function ExamError({ error, reset }: ExamErrorProps) {
       <div
         role="alert"
         aria-labelledby="error-heading"
-        className="w-full rounded-2xl border border-rose-200 bg-rose-50/50 p-8 shadow-sm sm:p-10"
+        className="ui-card w-full border-rose-200 bg-white p-6 sm:p-9"
       >
         {/* Error Icon */}
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-100 text-rose-700">
@@ -58,14 +58,14 @@ export default function ExamError({ error, reset }: ExamErrorProps) {
           <button
             type="button"
             onClick={() => reset()}
-            className="inline-flex items-center justify-center rounded-lg bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+            className="ui-button ui-button-primary"
           >
             Try again
           </button>
 
           <Link
             href="/exams"
-            className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+            className="ui-button ui-button-secondary"
           >
             Browse all exams
           </Link>

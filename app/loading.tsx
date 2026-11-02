@@ -1,1 +1,1 @@
-export default function Loading() { return <main className="mx-auto max-w-5xl px-6 py-16" aria-live="polite">Loading…</main>; }
+export default function Loading() { return <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12" aria-live="polite" aria-busy="true"><div className="ui-card animate-pulse p-6"><div className="h-4 w-32 rounded bg-slate-200" /><div className="mt-4 h-9 w-72 max-w-full rounded bg-slate-200" /><div className="mt-3 h-5 w-full max-w-xl rounded bg-slate-100" /></div><span className="sr-only">Loading page…</span></main>; }

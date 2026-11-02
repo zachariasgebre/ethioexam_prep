@@ -14,13 +14,13 @@ export default async function NewAdminExamPage() {
   if (user.role !== "admin") notFound();
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12">
+    <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
       <nav aria-label="Breadcrumb" className="mb-5 text-sm text-slate-500">
         <Link href="/admin" className="font-medium text-purple-700 hover:underline">Admin portal</Link>
         <span className="px-2" aria-hidden="true">/</span>
         <span aria-current="page">Create exam</span>
       </nav>
-      <header className="mb-8 border-b border-slate-200 pb-6">
+      <header className="mb-8 rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-sm sm:p-7">
         <p className="text-xs font-bold uppercase tracking-wider text-purple-700">Admin only</p>
         <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">Create an exam</h1>
         <p className="mt-2 text-slate-600">Add a new subject and year, then enter its questions and answer explanations.</p>

@@ -40,8 +40,8 @@ export default async function ExamPage({ params }: { params: Promise<ExamParams>
   if (examQuestions.length !== exam.totalQuestions) notFound();
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-12">
-      <header className="border-b border-slate-200 pb-6">
+    <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+      <header className="rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-sm sm:p-7">
         <nav aria-label="Breadcrumb" className="mb-4 text-sm text-slate-500">
           <Link href="/" className="font-medium text-emerald-700 hover:underline">Home</Link>
           <span className="px-2" aria-hidden="true">/</span>

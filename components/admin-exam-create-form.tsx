@@ -95,7 +95,7 @@ export function AdminExamCreateForm() {
       )}
 
       <form className="space-y-8" onSubmit={handleSubmit}>
-        <section className="grid gap-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-2 sm:p-6" aria-labelledby="exam-details-heading">
+        <section className="ui-card grid gap-5 p-5 sm:grid-cols-2 sm:p-6" aria-labelledby="exam-details-heading">
           <div className="sm:col-span-2">
             <h2 id="exam-details-heading" className="text-lg font-bold text-slate-900">Exam details</h2>
             <p className="mt-1 text-sm text-slate-600">Set the subject, year, and access level for the new paper.</p>
@@ -103,7 +103,7 @@ export function AdminExamCreateForm() {
 
           <label className="block text-sm font-medium text-slate-700" htmlFor="exam-subject">
             Subject
-            <select id="exam-subject" className="mt-1.5 block min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3" value={subjectChoice} onChange={(event) => setSubjectChoice(event.target.value)}>
+            <select id="exam-subject" className="ui-field mt-2" value={subjectChoice} onChange={(event) => setSubjectChoice(event.target.value)}>
               {subjects.map((subject) => <option key={subject} value={subject}>{subject}</option>)}
               <option value="Other">Other subject...</option>
             </select>
@@ -112,13 +112,13 @@ export function AdminExamCreateForm() {
           {subjectChoice === "Other" && (
             <label className="block text-sm font-medium text-slate-700" htmlFor="custom-subject">
               New subject name
-              <input id="custom-subject" className="mt-1.5 block min-h-11 w-full rounded-lg border border-slate-300 px-3" value={customSubject} maxLength={80} onChange={(event) => setCustomSubject(event.target.value)} required />
+              <input id="custom-subject" className="ui-field mt-2" value={customSubject} maxLength={80} onChange={(event) => setCustomSubject(event.target.value)} required />
             </label>
           )}
 
           <label className="block text-sm font-medium text-slate-700" htmlFor="exam-year">
             Exam year
-            <input id="exam-year" className="mt-1.5 block min-h-11 w-full rounded-lg border border-slate-300 px-3" value={year} placeholder="2016 E.C." maxLength={40} onChange={(event) => setYear(event.target.value)} required />
+            <input id="exam-year" className="ui-field mt-2" value={year} placeholder="2016 E.C." maxLength={40} onChange={(event) => setYear(event.target.value)} required />
           </label>
 
           <label className="flex min-h-11 items-center gap-3 text-sm font-medium text-slate-700 sm:col-span-2">
@@ -133,7 +133,7 @@ export function AdminExamCreateForm() {
               <h2 id="questions-heading" className="text-xl font-bold text-slate-900">Questions</h2>
               <p className="mt-1 text-sm text-slate-600">Add a prompt, four options, the answer key, and an explanation.</p>
             </div>
-            <button type="button" className="min-h-11 rounded-lg border border-emerald-700 px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-50" onClick={addQuestion}>
+            <button type="button" className="ui-button ui-button-secondary" onClick={addQuestion}>
               Add question
             </button>
           </div>
@@ -141,12 +141,12 @@ export function AdminExamCreateForm() {
           <ol className="space-y-5">
             {questions.map((question, questionIndex) => (
               <li key={question.key}>
-                <fieldset className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <fieldset className="ui-card p-5 sm:p-6">
                   <legend className="sr-only">Question {questionIndex + 1}</legend>
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <h3 className="font-semibold text-slate-900">Question {questionIndex + 1}</h3>
                     {questions.length > 1 && (
-                      <button type="button" className="min-h-10 rounded-lg px-3 text-sm font-medium text-rose-700 hover:bg-rose-50" onClick={() => setQuestions((current) => current.filter((item) => item.key !== question.key))}>
+                      <button type="button" className="ui-button min-h-10 bg-rose-50 px-3 py-1.5 text-xs text-rose-700 hover:bg-rose-100" onClick={() => setQuestions((current) => current.filter((item) => item.key !== question.key))}>
                         Remove
                       </button>
                     )}
@@ -154,7 +154,7 @@ export function AdminExamCreateForm() {
 
                   <label className="block text-sm font-medium text-slate-700" htmlFor={`${question.key}-prompt`}>
                     Question text
-                    <textarea id={`${question.key}-prompt`} className="mt-1.5 block min-h-24 w-full rounded-lg border border-slate-300 p-3" value={question.prompt} maxLength={2000} onChange={(event) => updateQuestion(question.key, { prompt: event.target.value })} required />
+                    <textarea id={`${question.key}-prompt`} className="ui-field mt-2 min-h-28 resize-y" value={question.prompt} maxLength={2000} onChange={(event) => updateQuestion(question.key, { prompt: event.target.value })} required />
                   </label>
 
                   <fieldset className="mt-5 space-y-3">
@@ -171,7 +171,7 @@ export function AdminExamCreateForm() {
                         />
                         <label className="min-w-0 flex-1 text-sm text-slate-600" htmlFor={`${question.key}-option-${optionIndex}`}>
                           <span className="font-semibold">{optionLetters[optionIndex]}.</span>
-                          <input id={`${question.key}-option-${optionIndex}`} className="mt-1 block min-h-11 w-full rounded-lg border border-slate-300 px-3 text-slate-900" value={option} maxLength={500} onChange={(event) => updateOption(question.key, optionIndex, event.target.value)} required />
+                          <input id={`${question.key}-option-${optionIndex}`} className="ui-field mt-1.5" value={option} maxLength={500} onChange={(event) => updateOption(question.key, optionIndex, event.target.value)} required />
                         </label>
                       </div>
                     ))}
@@ -179,7 +179,7 @@ export function AdminExamCreateForm() {
 
                   <label className="mt-5 block text-sm font-medium text-slate-700" htmlFor={`${question.key}-explanation`}>
                     Explanation
-                    <textarea id={`${question.key}-explanation`} className="mt-1.5 block min-h-20 w-full rounded-lg border border-slate-300 p-3" value={question.explanation} maxLength={4000} onChange={(event) => updateQuestion(question.key, { explanation: event.target.value })} />
+                    <textarea id={`${question.key}-explanation`} className="ui-field mt-2 min-h-24 resize-y" value={question.explanation} maxLength={4000} onChange={(event) => updateQuestion(question.key, { explanation: event.target.value })} />
                   </label>
                 </fieldset>
               </li>
@@ -190,8 +190,8 @@ export function AdminExamCreateForm() {
         {error && <p role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
 
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <Link href="/admin" className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</Link>
-          <button type="submit" disabled={pending} className="min-h-11 rounded-lg bg-purple-700 px-5 py-2 text-sm font-semibold text-white hover:bg-purple-800 disabled:cursor-not-allowed disabled:opacity-60">
+          <Link href="/admin" className="ui-button ui-button-secondary">Cancel</Link>
+          <button type="submit" disabled={pending} className="ui-button bg-purple-700 px-5 py-2.5 text-white shadow-sm hover:bg-purple-800">
             {pending ? "Creating exam..." : "Create exam"}
           </button>
         </div>

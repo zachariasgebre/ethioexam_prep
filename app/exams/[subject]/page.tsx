@@ -30,8 +30,8 @@ export default async function SubjectExamsPage({ params }: { params: Promise<Sub
   if (availableExams.length === 0) notFound();
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12">
-      <header className="border-b border-slate-200 pb-6">
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+      <header className="rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-sm sm:p-7">
         <nav aria-label="Breadcrumb" className="mb-4 text-sm text-slate-500">
           <Link href="/" className="font-medium text-emerald-700 hover:underline">Home</Link>
           <span className="px-2" aria-hidden="true">/</span>
@@ -48,7 +48,7 @@ export default async function SubjectExamsPage({ params }: { params: Promise<Sub
           <li key={exam.id}>
             <Link
               href={`/exams/${encodeURIComponent(subject)}/${encodeURIComponent(exam.year)}`}
-              className="group block h-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-600 hover:shadow-md"
+              className="ui-card ui-card-interactive group block h-full p-6"
             >
               <div className="flex items-start justify-between gap-3">
                 <h2 className="text-2xl font-bold text-slate-900 group-hover:text-emerald-700">{exam.year}</h2>

@@ -1,3 +1,3 @@
 import Link from "next/link";
 
-export default function NotFound() { return <main className="mx-auto max-w-xl px-6 py-24"><h1 className="text-3xl font-bold">Page not found</h1><Link className="mt-4 inline-block text-emerald-800 underline" href="/">Return home</Link></main>; }
+export default function NotFound() { return <main className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-start justify-center px-4 py-16 sm:px-6"><section className="ui-card w-full p-7 sm:p-10"><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">404 · Page not found</p><h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950">We can’t find that page</h1><p className="mt-2 text-sm leading-6 text-slate-600">The link may be out of date, or the page may have moved.</p><Link className="ui-button ui-button-primary mt-6" href="/">Return home</Link></section></main>; }

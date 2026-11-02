@@ -17,11 +17,11 @@ export function SignUpForm({ nextTo }: { nextTo?: string }) {
     } catch { setError("Unable to create your account right now. Please try again."); }
     finally { setPending(false); }
   }
-  return <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-    <label className="block text-sm font-medium">Name<input className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2" type="text" name="name" autoComplete="name" minLength={2} required /></label>
-    <label className="block text-sm font-medium">Email<input className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2" type="email" name="email" autoComplete="email" required /></label>
-    <label className="block text-sm font-medium">Password<input className="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2" type="password" name="password" autoComplete="new-password" minLength={8} required /></label>
-    {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
-    <button className="w-full rounded-lg bg-emerald-700 px-4 py-3 font-semibold text-white disabled:opacity-60" type="submit" disabled={pending}>{pending ? "Creating account…" : "Create account"}</button>
+  return <form className="space-y-5" onSubmit={handleSubmit}>
+    <label className="block text-sm font-semibold text-slate-700">Name<input className="ui-field mt-2" type="text" name="name" autoComplete="name" placeholder="Your name" minLength={2} required /></label>
+    <label className="block text-sm font-semibold text-slate-700">Email<input className="ui-field mt-2" type="email" name="email" autoComplete="email" placeholder="you@example.com" required /></label>
+    <label className="block text-sm font-semibold text-slate-700">Password<input className="ui-field mt-2" type="password" name="password" autoComplete="new-password" placeholder="At least 8 characters" minLength={8} required /></label>
+    {error && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">{error}</p>}
+    <button className="ui-button ui-button-primary w-full" type="submit" disabled={pending}>{pending ? "Creating account…" : "Create account"}</button>
   </form>;
 }

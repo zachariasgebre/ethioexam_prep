@@ -73,7 +73,7 @@ export function ExamQuizRunner({ examId, questions }: { examId: string; question
 
   return (
     <div className="mt-8 space-y-5">
-      <section className="sticky top-3 z-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur" aria-label="Exam progress">
+      <section className="ui-card sticky top-3 z-10 flex flex-wrap items-center justify-between gap-3 bg-white/95 p-4 backdrop-blur" aria-label="Exam progress">
         <p className="text-sm font-medium text-slate-700">{answeredCount} of {questions.length} answered</p>
         {complete ? (
           <p className="text-sm font-semibold text-emerald-800" role="status">
@@ -82,7 +82,7 @@ export function ExamQuizRunner({ examId, questions }: { examId: string; question
         ) : (
           <button
             type="button"
-            className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="ui-button ui-button-primary"
             onClick={submitExam}
             disabled={submitting || answeredCount !== questions.length}
           >
@@ -91,7 +91,7 @@ export function ExamQuizRunner({ examId, questions }: { examId: string; question
         )}
       </section>
 
-      {submitError && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">{submitError}</p>}
+      {submitError && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-800">{submitError}</p>}
 
       <ol className="space-y-5">
         {questions.map((question, questionIndex) => {
@@ -105,7 +105,7 @@ export function ExamQuizRunner({ examId, questions }: { examId: string; question
 
           return (
             <li key={question.id}>
-              <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+              <article className="ui-card p-5 sm:p-7">
                 <p className="text-xs font-bold uppercase tracking-wider text-emerald-700">Question {questionIndex + 1}</p>
                 <h2 className="mt-2 text-lg font-semibold leading-7 text-slate-900 sm:text-xl">{question.prompt}</h2>
 
@@ -121,7 +121,7 @@ export function ExamQuizRunner({ examId, questions }: { examId: string; question
                         : "border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/40";
 
                     return (
-                      <label key={`${question.id}-${optionIndex}`} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition sm:p-4 ${optionStyle}`}>
+                      <label key={`${question.id}-${optionIndex}`} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition-[background-color,border-color,box-shadow] sm:p-4 ${optionStyle}`}>
                         <input
                           className="mt-1 size-4 shrink-0 accent-emerald-700"
                           type="radio"
@@ -144,7 +144,7 @@ export function ExamQuizRunner({ examId, questions }: { examId: string; question
                 <div className="mt-4 border-t border-slate-100 pt-4">
                   <button
                     type="button"
-                    className="inline-flex min-h-11 items-center gap-2 rounded-lg px-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-50"
+                    className="ui-button ui-button-quiet min-h-11 px-3 text-emerald-800"
                     aria-expanded={isExpanded}
                     aria-controls={explanationId}
                     disabled={checking[question.id]}
@@ -178,11 +178,11 @@ export function ExamQuizRunner({ examId, questions }: { examId: string; question
       </ol>
 
       {!complete && (
-        <div className="flex flex-col items-start gap-2 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="ui-card flex flex-col items-start gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-slate-600">Answer every question to save your score.</p>
           <button
             type="button"
-            className="min-h-11 rounded-lg bg-emerald-700 px-5 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="ui-button ui-button-primary"
             onClick={submitExam}
             disabled={submitting || answeredCount !== questions.length}
           >

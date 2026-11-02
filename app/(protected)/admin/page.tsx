@@ -40,9 +40,9 @@ export default async function AdminPage() {
   const paidCount = allUsers.filter((u) => u.role !== "admin" && u.hasPaid).length;
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-12">
+    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
       {/* Top Header */}
-      <div className="flex flex-col justify-between gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-4 rounded-3xl border border-slate-200/80 bg-white/80 p-5 shadow-sm sm:flex-row sm:items-center sm:p-7">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-purple-700">Security Guarded</span>
@@ -56,13 +56,13 @@ export default async function AdminPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/exams/new"
-            className="rounded-lg bg-purple-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-800"
+            className="ui-button bg-purple-700 text-white shadow-sm hover:bg-purple-800"
           >
             Create Exam
           </Link>
           <Link
             href="/dashboard"
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+            className="ui-button ui-button-secondary"
           >
             ← Back to Dashboard
           </Link>
@@ -110,7 +110,7 @@ export default async function AdminPage() {
             <p className="text-slate-600">No users found in database.</p>
           </Card>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="ui-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm text-slate-700">
                 <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-600">
