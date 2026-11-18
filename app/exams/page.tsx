@@ -1,41 +1,42 @@
 import Link from "next/link";
-import { db } from "@/db";
-import { exams } from "@/db/schema";
+import { CircularProgress } from "@/components/circular-progress";
+import { getCurrentSession } from "@/lib/current-session";
 import { sampleExamFixtures } from "@/lib/fixtures";
+import { getSubjectCompletion } from "@/lib/subject-completion";
 
 export const metadata = {
   title: "National Exams | EthioExam Prep",
   description: "Browse Ethiopian national exam papers by subject and year.",
 };
 
+type SubjectSummary = { subject: string; totalYears: number; attemptedYears: number };
+const subjectCardColors = [
+  "border-emerald-200 from-emerald-50 via-white to-cyan-50 hover:border-emerald-400",
+  "border-sky-200 from-sky-50 via-white to-indigo-50 hover:border-sky-400",
+  "border-amber-200 from-amber-50 via-white to-orange-50 hover:border-amber-400",
+  "border-fuchsia-200 from-fuchsia-50 via-white to-pink-50 hover:border-fuchsia-400",
+  "border-violet-200 from-violet-50 via-white to-blue-50 hover:border-violet-400",
+];
+
 export default async function ExamsPage() {
-  let availableExams: Array<{ id: string; subject: string; year: string; totalQuestions: number }> = [];
+  let subjectGroups: SubjectSummary[] = [];
   let isDatabaseOffline = false;
 
   try {
-    availableExams = await db.select({
-      id: exams.id,
-      subject: exams.subject,
-      year: exams.year,
-      totalQuestions: exams.totalQuestions,
-    }).from(exams).orderBy(exams.subject, exams.year);
+    const session = await getCurrentSession().catch(() => null);
+    const summary = await getSubjectCompletion(session?.user.id ?? null);
+    subjectGroups = summary.map((row) => ({ subject: row.subject, totalYears: row.totalYears, attemptedYears: row.attemptedYears }));
   } catch (error) {
     console.warn("Database unreachable in ExamsPage, using sample exam fixtures:", error);
     isDatabaseOffline = true;
-    availableExams = sampleExamFixtures.map((fixture, index) => ({
-      id: `preview-${index}`,
-      subject: fixture.subject,
-      year: fixture.year,
-      totalQuestions: fixture.questions.length,
-    }));
+    subjectGroups = Array.from(new Set(sampleExamFixtures.map((fixture) => fixture.subject)))
+      .sort((first, second) => first.localeCompare(second))
+      .map((subject) => ({
+        subject,
+        totalYears: new Set(sampleExamFixtures.filter((fixture) => fixture.subject === subject).map((fixture) => fixture.year)).size,
+        attemptedYears: 0,
+      }));
   }
-
-  const subjectGroups = Array.from(
-    availableExams.reduce((groups, exam) => {
-      groups.set(exam.subject, (groups.get(exam.subject) ?? 0) + 1);
-      return groups;
-    }, new Map<string, number>()),
-  ).sort(([first], [second]) => first.localeCompare(second));
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
@@ -57,23 +58,30 @@ export default async function ExamsPage() {
 
       {subjectGroups.length > 0 ? (
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {subjectGroups.map(([subject, examCount]) => (
+          {subjectGroups.map(({ subject, totalYears, attemptedYears }, index) => {
+            const percentage = totalYears === 0 ? 0 : Math.round((attemptedYears / totalYears) * 100);
+            const color = subjectCardColors[index % subjectCardColors.length];
+            return (
             <li key={subject}>
               <Link
                 href={`/exams/${encodeURIComponent(subject)}`}
-                className="ui-card ui-card-interactive group flex h-full min-h-40 flex-col justify-between p-6"
+                className={`ui-card ui-card-interactive group colorful-card flex h-full min-h-44 flex-col justify-between bg-gradient-to-br p-6 ${color}`}
               >
-                <div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Grade 12 Matriculation</span>
-                  <h2 className="mt-3 text-2xl font-bold text-slate-900 group-hover:text-emerald-700">{subject}</h2>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Grade 12 Matriculation</span>
+                    <h2 className="mt-3 text-2xl font-bold text-slate-900 group-hover:text-emerald-700">{subject}</h2>
+                  </div>
+                  <CircularProgress percentage={percentage} label={`${attemptedYears} of ${totalYears} exam years attempted`} />
                 </div>
                 <span className="mt-6 text-sm text-slate-600">
-                  {examCount} exam {examCount === 1 ? "year" : "years"}
+                  {totalYears} exam {totalYears === 1 ? "year" : "years"}
                   <span aria-hidden="true"> · Browse years →</span>
                 </span>
               </Link>
             </li>
-          ))}
+            );
+          })}
         </ul>
       ) : (
         <div className="mt-8 rounded-2xl border border-dashed border-slate-300 p-10 text-center sm:p-12">

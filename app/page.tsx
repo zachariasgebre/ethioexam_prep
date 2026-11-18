@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <main className="relative isolate flex min-h-svh overflow-hidden bg-slate-950 text-white">
+    <main className="relative isolate flex min-h-[calc(100svh-4rem)] overflow-hidden bg-slate-950 text-white">
       <Image
         src="/classroom-bg.jpg"
         alt="Ethiopian Grade 12 students studying together in a classroom"

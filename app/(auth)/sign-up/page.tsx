@@ -1,10 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { SignUpForm } from "@/components/sign-up-form";
-import { auth } from "@/lib/auth";
+import { getCurrentSession } from "@/lib/current-session";
 
 export const metadata: Metadata = {
   title: "Create account | EthioExam Prep",
@@ -13,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function SignUpPage({ searchParams }: { searchParams: Promise<{ next?: string | string[] }> }) {
   const { next } = await searchParams;
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getCurrentSession();
   if (session) redirect("/dashboard");
   const signinHref = typeof next === "string" ? `/sign-in?next=${encodeURIComponent(next)}` : "/sign-in";
 

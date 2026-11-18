@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
-  boolean, integer, json, pgTable, text, timestamp, uniqueIndex, uuid,
+  boolean, index, integer, json, pgTable, text, timestamp, uniqueIndex, uuid,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -80,7 +80,7 @@ export const userProgress = pgTable("user_progress", {
   score: integer("score").notNull(),
   totalQuestions: integer("total_questions").notNull(),
   completedAt: timestamp("completed_at").notNull().defaultNow(),
-});
+}, (table) => [index("user_progress_user_exam_idx").on(table.userId, table.examId)]);
 
 export const examsRelations = relations(exams, ({ many }) => ({ questions: many(questions), userProgress: many(userProgress) }));
 export const questionsRelations = relations(questions, ({ one }) => ({ exam: one(exams, { fields: [questions.examId], references: [exams.id] }) }));

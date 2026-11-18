@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getUserProgress } from "@/lib/actions/exams";
 import { DeleteProgressButton } from "@/components/delete-progress-button";
@@ -57,9 +58,9 @@ function ScoreChart({ attempts }: { attempts: Attempt[] }) {
                       >
                         {percentage}%
                       </span>
-                      <div
-                        aria-hidden="true"
-                        className="absolute bottom-0 left-1/2 w-[min(2.4rem,72%)] -translate-x-1/2 rounded-t-lg bg-gradient-to-t from-emerald-800 to-emerald-500 shadow-[0_3px_10px_-5px_rgba(5,150,105,0.8)]"
+                <div
+                  aria-hidden="true"
+                  className={`absolute bottom-0 left-1/2 w-[min(2.4rem,72%)] -translate-x-1/2 rounded-t-lg shadow-[0_3px_10px_-5px_rgba(5,150,105,0.35)] transition duration-300 hover:brightness-110 ${percentage >= 80 ? "bg-gradient-to-t from-emerald-800 to-emerald-400" : percentage >= 50 ? "bg-gradient-to-t from-cyan-700 to-cyan-400" : "bg-gradient-to-t from-amber-700 to-amber-400"}`}
                         style={{ height: `${Math.max(percentage, 2)}%` }}
                       />
                     </div>
@@ -89,6 +90,7 @@ function ScoreChart({ attempts }: { attempts: Attempt[] }) {
 }
 
 function AnswerDistributionChart({ attempts }: { attempts: Attempt[] }) {
+  const [activeSegment, setActiveSegment] = useState<"correct" | "incorrect" | null>(null);
   const correctAnswers = attempts.reduce((total, attempt) => total + attempt.score, 0);
   const totalAnswers = attempts.reduce((total, attempt) => total + attempt.totalQuestions, 0);
   const incorrectAnswers = totalAnswers - correctAnswers;
@@ -104,20 +106,57 @@ function AnswerDistributionChart({ attempts }: { attempts: Attempt[] }) {
 
   const correctPercentage = Math.round((correctAnswers / totalAnswers) * 100);
   const incorrectPercentage = 100 - correctPercentage;
+  const radius = 52;
+  const circumference = 2 * Math.PI * radius;
+  const correctLength = circumference * correctPercentage / 100;
+  const incorrectLength = circumference - correctLength;
+  const highlighted = activeSegment === "correct"
+    ? { label: "Correct", percentage: correctPercentage }
+    : activeSegment === "incorrect"
+      ? { label: "Incorrect", percentage: incorrectPercentage }
+      : null;
 
   return (
     <div className="mt-5 flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-center lg:flex-col xl:flex-row">
-      <div
-        role="img"
-        aria-label={`Answer distribution: ${correctAnswers} correct answers (${correctPercentage} percent), ${incorrectAnswers} incorrect answers (${incorrectPercentage} percent).`}
-        className="relative size-44 shrink-0 rounded-full p-3 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.45)]"
-        style={{ background: `conic-gradient(from -90deg, #059669 0 ${correctPercentage}%, #fecdd3 ${correctPercentage}% 100%)` }}
+      <svg
+        className="size-44 shrink-0 overflow-visible drop-shadow-lg"
+        viewBox="0 0 128 128"
+        role="group"
+        aria-label={`Answer distribution: ${correctAnswers} correct (${correctPercentage} percent), ${incorrectAnswers} incorrect (${incorrectPercentage} percent). Hover or focus a segment for details.`}
       >
-        <div aria-hidden="true" className="flex size-full flex-col items-center justify-center rounded-full border border-slate-100 bg-white shadow-inner">
-          <span className="text-3xl font-bold tracking-tight text-slate-900">{correctPercentage}%</span>
-          <span className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Correct</span>
-        </div>
-      </div>
+        <circle cx="64" cy="64" r={radius} fill="none" className="stroke-slate-100" strokeWidth="16" />
+        {correctLength > 0 && <circle
+          cx="64" cy="64" r={radius} fill="none"
+          className={`cursor-help transition-all duration-300 ${activeSegment === "correct" ? "stroke-cyan-500" : "stroke-emerald-500"}`}
+          strokeWidth={activeSegment === "correct" ? 21 : 16}
+          strokeDasharray={`${correctLength} ${circumference - correctLength}`}
+          transform="rotate(-90 64 64)"
+          tabIndex={0} role="img"
+          aria-label={`${correctAnswers} correct answers, ${correctPercentage} percent`}
+          onMouseEnter={() => setActiveSegment("correct")}
+          onMouseLeave={() => setActiveSegment(null)}
+          onFocus={() => setActiveSegment("correct")}
+          onBlur={() => setActiveSegment(null)}
+        />}
+        {incorrectLength > 0 && <circle
+          cx="64" cy="64" r={radius} fill="none"
+          className={`cursor-help transition-all duration-300 ${activeSegment === "incorrect" ? "stroke-fuchsia-500" : "stroke-rose-400"}`}
+          strokeWidth={activeSegment === "incorrect" ? 21 : 16}
+          strokeDasharray={`${incorrectLength} ${circumference - incorrectLength}`}
+          strokeDashoffset={-correctLength}
+          transform="rotate(-90 64 64)"
+          tabIndex={0} role="img"
+          aria-label={`${incorrectAnswers} incorrect answers, ${incorrectPercentage} percent`}
+          onMouseEnter={() => setActiveSegment("incorrect")}
+          onMouseLeave={() => setActiveSegment(null)}
+          onFocus={() => setActiveSegment("incorrect")}
+          onBlur={() => setActiveSegment(null)}
+        />}
+        <text x="64" y="59" textAnchor="middle" className="fill-slate-500 text-[9px] font-bold uppercase tracking-wider">{highlighted?.label ?? "Correct"}</text>
+        <text x="64" y="80" textAnchor="middle" className={`text-[21px] font-bold ${highlighted?.label === "Incorrect" ? "fill-fuchsia-700" : "fill-emerald-700"}`}>
+          {highlighted ? `${highlighted.percentage}%` : `${correctPercentage}%`}
+        </text>
+      </svg>
       <ul className="w-full max-w-xs space-y-3">
         <li className="flex items-center justify-between gap-4 rounded-xl bg-emerald-50/80 px-3.5 py-3">
           <span className="flex items-center gap-2.5 text-sm font-medium text-slate-700"><span aria-hidden="true" className="size-2.5 rounded-full bg-emerald-600" />Correct</span>
@@ -146,7 +185,7 @@ export function DashboardProgress({
 }) {
   const { data: attempts, isPending, isError, refetch } = useQuery({
     queryKey: [...dashboardProgressQueryKey, userId],
-    queryFn: getUserProgress,
+    queryFn: () => getUserProgress(),
   });
 
   const totalScore = attempts?.reduce((total, attempt) => total + attempt.score, 0) ?? 0;

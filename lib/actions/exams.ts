@@ -122,6 +122,7 @@ export async function submitExamAttempt(
     score,
     totalQuestions: exam.totalQuestions,
   }).returning({ id: userProgress.id });
+  revalidatePath("/exams");
   revalidatePath("/dashboard");
   return { success: true, attemptId: attempt.id, score, totalQuestions: exam.totalQuestions };
 }
@@ -135,6 +136,7 @@ export async function deleteUserProgress(progressId: string) {
     .where(and(eq(userProgress.id, progressId), eq(userProgress.userId, user.id)))
     .returning({ id: userProgress.id });
   if (deleted.length === 0) return { error: "Record not found or unauthorized" };
+  revalidatePath("/exams");
   revalidatePath("/dashboard");
   return { success: true };
 }

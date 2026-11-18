@@ -11,8 +11,17 @@
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--page); color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(ellipse at 8% 4%, rgb(167 243 208 / 22%), transparent 28rem),
+    radial-gradient(ellipse at 94% 18%, rgb(191 219 254 / 25%), transparent 32rem),
+    linear-gradient(180deg, #f8fafc 0%, #f0fdfa 52%, #f8fafc 100%);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
 a { color: inherit; }
+::selection { background: #a7f3d0; color: #064e3b; }
 :focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; }
 button:disabled { cursor: not-allowed; }
 
