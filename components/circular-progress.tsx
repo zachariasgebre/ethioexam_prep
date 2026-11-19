@@ -22,8 +22,8 @@ export function CircularProgress({ percentage, size = 56, strokeWidth = 5, label
         role="img"
         aria-label={`${value}% ${label}`}
         tabIndex={0}
-        title={`${value}% ${label}`}
       >
+        <title>{`${value}% ${label}`}</title>
         <circle className="stroke-slate-200 transition-colors group-hover/progress:stroke-fuchsia-200 group-focus-within/progress:stroke-fuchsia-200" cx={size / 2} cy={size / 2} r={radius} fill="none" strokeWidth={strokeWidth} />
         <circle
           className="stroke-current transition-[stroke-dashoffset] duration-700 ease-out"

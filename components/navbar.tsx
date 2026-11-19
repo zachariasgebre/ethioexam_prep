@@ -6,7 +6,7 @@ export async function Navbar() {
   let currentUser: { name: string; email: string; role: string } | null = null;
   try {
     const session = await getCurrentSession();
-    if (session) currentUser = { name: session.user.name, email: session.user.email, role: session.user.role };
+    if (session) currentUser = { name: session.user.name, email: session.user.email, role: session.user.role ?? "user" };
   } catch {
     // Keep public navigation available if the auth database is temporarily unavailable.
   }
